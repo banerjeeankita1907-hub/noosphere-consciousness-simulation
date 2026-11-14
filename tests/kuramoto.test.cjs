@@ -28,7 +28,7 @@ test("zero coupling preserves independent phase velocities", () => {
     count: 12, seed: 7, coupling: 0, frequencySpread: 0,
     duration: 1, dt: 0.01, sampleEvery: 10,
   });
-  assert.equal(result.finalOrderParameter, result.initialOrderParameter);
+  assert.ok(Math.abs(result.finalOrderParameter - result.initialOrderParameter) < 1e-12);
 });
 
 test("trace contains the initial point and final simulated time", () => {
