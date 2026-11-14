@@ -103,15 +103,22 @@ function simulateKuramoto(input = {}) {
     meanSine /= config.count;
 
     const nextPhases = new Array(config.count);
+    const stepDt = Math.min(config.dt, config.duration - time);
     for (let i = 0; i < config.count; i += 1) {
       const couplingTerm = meanSine * Math.cos(phases[i]) - meanCosine * Math.sin(phases[i]);
       const derivative = naturalFrequencies[i] + config.coupling * couplingTerm;
-      nextPhases[i] = wrapPhase(phases[i] + config.dt * derivative);
+      nextPhases[i] = wrapPhase(phases[i] + stepDt * derivative);
     }
     for (let i = 0; i < config.count; i += 1) phases[i] = nextPhases[i];
 
-    time = Math.min(step * config.dt, config.duration);
-    if (step % config.sampleEvery === 0 || step === steps) sample(step);
+    time += stepDt;
+    if (step % config.sampleEvery === 0 || step === steps) {
+      const last = trace[trace.length - 1];
+      trace.push({
+        time: Number(time.toFixed(10)),
+        orderParameter: orderParameter(phases),
+      });
+    }
   }
 
   return {
