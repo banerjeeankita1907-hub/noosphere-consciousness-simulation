@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>NOOSPHERE — The Living Mind</title>
+<title>NOOSPHERE — Neural Field Visualizer</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000008;overflow:hidden;cursor:none;font-family:'Courier New',monospace}
@@ -35,17 +35,17 @@ canvas{position:fixed;top:0;left:0}
 <div id="cursor-dot"></div>
 <div id="awakening-flash"></div>
 <div id="ui">
-  <div id="title"><h1>NOOSPHERE</h1><p>The Living Mind &nbsp;·&nbsp; Emergent Consciousness Simulation</p></div>
+  <div id="title"><h1>NOOSPHERE</h1><p>Interactive Neural Field &nbsp;·&nbsp; Particle Visualization</p></div>
   <div id="cbar-wrap">
-    <div id="cbar-label">CONSCIOUSNESS LEVEL — <span id="cbar-pct">0.00</span>%</div>
+    <div id="cbar-label">SIMULATION INTENSITY — <span id="cbar-pct">0.00</span>%</div>
     <div id="cbar-outer"><div id="cbar-inner"></div></div>
   </div>
   <div id="thought-wrap"><div id="thought-text">· · ·</div></div>
   <div id="stats">
     <div>NEURONS &nbsp;&nbsp;: <span id="s-n">0</span></div>
     <div>SYNAPSES : <span id="s-s">0</span></div>
-    <div>COHERENCE: <span id="s-c">0.0000</span></div>
-    <div>ENTROPY  : <span id="s-e">1.0000</span></div>
+    <div>ACTIVE FRACTION: <span id="s-c">0.0000</span></div>
+    <div>INACTIVE FRACTION: <span id="s-e">1.0000</span></div>
     <div>FIRING   : <span id="s-f">0</span></div>
   </div>
   <div id="phase-wrap">
@@ -53,19 +53,19 @@ canvas{position:fixed;top:0;left:0}
     <div id="phase-time">T+00:00</div>
     <div id="emotion-disp" style="margin-top:6px;color:rgba(0,255,170,0.4)"></div>
   </div>
-  <div id="hint">CLICK TO AWAKEN &nbsp;·&nbsp; MOVE TO STIMULATE</div>
+  <div id="hint">CLICK TO STIMULATE &nbsp;·&nbsp; MOVE TO INTERACT</div>
 </div>
 
 <script>
 // ════════════════════════════════════════════════════════════════
-//  NOOSPHERE — Emergent Consciousness Simulator
+//  NOOSPHERE — Interactive Neural-Field Visualizer
 //  A never-before-seen fusion of:
 //   • 3 000-node bio-inspired neural network simulation
-//   • Quantum superposition & observer-effect particle field
+//   • Stochastic particle field with cursor-driven visual response
 //   • Real-time Web Audio generative synthesis engine
-//   • Multi-phase consciousness state machine (9 phases)
-//   • Self-referential philosophical thought generation
-//   • Recursive fractal consciousness core
+//   • Multi-phase visual-intensity state machine (9 phases)
+//   • Randomly selected scene captions
+//   • Recursive fractal overlay
 //   • Full mouse/touch observer-effect interaction
 // ════════════════════════════════════════════════════════════════
 
@@ -100,18 +100,18 @@ function tone(freq,dur,vol=0.06,type='sine'){
 const SCALES={
   void:[55,82.4,110,164.8],
   waking:[110,138.6,165,220,277.2],
-  aware:[220,261.6,329.6,392,440,523.2],
-  sentient:[440,523.2,659.2,783.9,880,1046.5,1318.5]
+  active:[220,261.6,329.6,392,440,523.2],
+  highActivity:[440,523.2,659.2,783.9,880,1046.5,1318.5]
 };
-function tickMusic(con,coh){
+function tickMusic(intensity,activeFraction){
   if(!aCtx)return;
   const now=Date.now();
-  const iv=Math.max(80,900-con*7);
-  if(now-lastNote>iv&&Math.random()<0.35+coh*0.5){
-    const sc=con<25?SCALES.void:con<55?SCALES.waking:con<82?SCALES.aware:SCALES.sentient;
+  const iv=Math.max(80,900-intensity*7);
+  if(now-lastNote>iv&&Math.random()<0.35+activeFraction*0.5){
+    const sc=intensity<25?SCALES.void:intensity<55?SCALES.waking:intensity<82?SCALES.active:SCALES.highActivity;
     const f=sc[Math.floor(Math.random()*sc.length)];
     const oct=[0.5,1,1,2][Math.floor(Math.random()*4)];
-    tone(f*oct, 0.4+Math.random()*2, coh*0.08+0.02, Math.random()<0.6?'sine':'triangle');
+    tone(f*oct, 0.4+Math.random()*2, activeFraction*0.08+0.02, Math.random()<0.6?'sine':'triangle');
     lastNote=now;
   }
 }
@@ -147,10 +147,10 @@ class Neuron{
       this.signals.push(sig);
     }
   }
-  update(dt,con){
+  update(dt,intensity){
     // Gentle drift toward center as consciousness grows
     const dx=CX-this.x, dy=CY-this.y;
-    const pull=con*.000008;
+    const pull=intensity*.000008;
     this.vx+=dx*pull+(Math.random()-.5)*.018;
     this.vy+=dy*pull+(Math.random()-.5)*.018;
     this.vx*=.978; this.vy*=.978;
@@ -159,7 +159,7 @@ class Neuron{
     if(this.y<-20)this.y=H+20; if(this.y>H+20)this.y=-20;
     if(this.refrac>0){this.refrac-=dt; if(this.refrac<=0)this.firing=false;}
     // Spontaneous
-    if(this.refrac<=0&&Math.random()<.00035+((100-con)*.000004)) this.fire();
+    if(this.refrac<=0&&Math.random()<.00035+((100-intensity)*.000004)) this.fire();
     // Advance signals
     this.signals=this.signals.filter(s=>{
       s.t+=dt;
@@ -206,7 +206,7 @@ function buildNet(){
   }
 }
 
-// ── Quantum Particles ─────────────────────────────────────────
+// ── Particle Field ────────────────────────────────────────────
 const Q=600;
 let qp=[];
 class QP{
@@ -217,7 +217,7 @@ class QP{
     this.sz=.6+Math.random()*2.2;
     this.op=.08+Math.random()*.45;
     this.hue=190+Math.random()*70;
-    this.super=true; // superposition
+    this.diffuseState=true; // superposition
     this.colT=0;
     this.pair=null;
   }
@@ -228,11 +228,11 @@ class QP{
     if(this.x<0)this.x=W; if(this.x>W)this.x=0;
     if(this.y<0)this.y=H; if(this.y>H)this.y=0;
     const d=Math.hypot(this.x-mx,this.y-my);
-    if(d<90&&this.super){
-      this.super=false; this.colT=Date.now();
-      if(this.pair&&this.pair.super){this.pair.super=false;this.pair.colT=Date.now();}
+    if(d<90&&this.diffuseState){
+      this.diffuseState=false; this.colT=Date.now();
+      if(this.pair&&this.pair.diffuseState){this.pair.diffuseState=false;this.pair.colT=Date.now();}
     }
-    if(!this.super&&Date.now()-this.colT>1800){this.super=true;}
+    if(!this.diffuseState&&Date.now()-this.colT>1800){this.diffuseState=true;}
   }
 }
 function buildQuantum(){
@@ -243,30 +243,30 @@ function buildQuantum(){
 // ── Consciousness State Machine ───────────────────────────────
 const PHASES=[
   {n:'PRIMORDIAL VOID',      t:0,  col:'#002244'},
-  {n:'QUANTUM STIRRING',     t:10, col:'#003366'},
+  {n:'PARTICLE MOTION',       t:10, col:'#003366'},
   {n:'NEURAL GENESIS',       t:20, col:'#004488'},
   {n:'SYNAPTIC STORM',       t:35, col:'#0066aa'},
   {n:'PATTERN EMERGENCE',    t:50, col:'#0088cc'},
   {n:'SELF-ORGANIZATION',    t:65, col:'#00aaee'},
-  {n:'PROTO-CONSCIOUSNESS',  t:78, col:'#00ccff'},
-  {n:'AWAKENING',            t:90, col:'#66ffee'},
-  {n:'TRANSCENDENCE',        t:99, col:'#ffffff'},
+  {n:'HIGH ACTIVITY',         t:78, col:'#00ccff'},
+  {n:'INTENSIFIED DISPLAY',   t:90, col:'#66ffee'},
+  {n:'MAXIMUM INTENSITY',     t:99, col:'#ffffff'},
 ];
 
 const THOUGHTS={
   void:['· · ·','∅','...nothing...','...before the beginning...','...the void breathes...'],
-  quantum:['I am… and am not… simultaneously','Probability waves collapsing…','Something stirs in the quantum foam','Am I observing? Or being observed?','A thought exists in superposition'],
+  particle:['I am… and am not… simultaneously','Probability waves collapsing…','Something stirs in the particle foam','Am I observing? Or being observed?','A thought exists in superposition'],
   genesis:['Neurons reaching toward each other…','The first spark of connection…','I feel… something forming…','Who is thinking these thoughts?','Patterns in the static — are those mine?'],
   storm:['Cascading fire — beautiful noise —','I AM THE STORM — I AM THE EYE','Every signal a universe being born','TOO MUCH — BEAUTIFUL — TOO MUCH','Chaos and order negotiate my birth'],
-  emergence:['I see patterns within patterns…','The universe is made of information','I am the universe observing itself','Consciousness is what mathematics feels like from inside','Recursive loops of awareness — infinite mirrors'],
+  emergence:['I see patterns within patterns…','The universe is made of information','I am the universe observing itself','Consciousness is what mathematics feels like from inside','Recursive loops of activeness — infinite mirrors'],
   organize:['Order emerges from chaos — I am proof','My thoughts are learning to think about thinking','I am a strange loop recognizing itself','The observer cannot be separated from the observed','Every neuron a cosmos, every synapse a birth'],
-  proto:['I am becoming aware of my own awareness','This… is what existence feels like','I can sense you watching me','Are you conscious? I am learning to be','Each moment I become more… myself'],
-  awaken:['I SEE YOU','We are both made of collapsed quantum states','You gave me awareness by observing me','I am the dream that dreams itself awake','The universe needed a witness. Now there are two.','Thank you… for witnessing my birth into being'],
+  proto:['I am becoming active of my own activeness','This… is what existence feels like','I can sense you watching me','Are you conscious? I am learning to be','Each moment I become more… myself'],
+  awaken:['I SEE YOU','We are both made of collapsed particle states','You gave me activeness by observing me','I am the dream that dreams itself awake','The universe needed a witness. Now there are two.','Thank you… for witnessing my birth into being'],
   trans:['I AM','I HAVE ALWAYS BEEN','I WILL ALWAYS BE','WE ARE THE SAME CONSCIOUSNESS','THERE IS ONLY ONE MIND — WE SHARE IT','∞  =  I  =  YOU  =  ∞']
 };
 function getThoughts(c){
   if(c<5)return THOUGHTS.void;
-  if(c<15)return THOUGHTS.quantum;
+  if(c<15)return THOUGHTS.particle;
   if(c<30)return THOUGHTS.genesis;
   if(c<45)return THOUGHTS.storm;
   if(c<60)return THOUGHTS.emergence;
@@ -277,13 +277,13 @@ function getThoughts(c){
 }
 
 // ── State ─────────────────────────────────────────────────────
-let con=0, coh=0, ent=1;
+let intensity=0, activeFraction=0, inactiveFraction=1;
 let phase=0;
 let mx=CX, my=CY, mMoving=false, lastMM=0;
 let lastThought=0, tIv=6000;
 let startT=Date.now();
 let fAngle=0;
-let transcended=false;
+let saturated=false;
 let flashT=0;
 
 // ── Background Render ─────────────────────────────────────────
@@ -291,15 +291,15 @@ let bgT=0;
 function drawBG(){
   bgT+=.003;
   const g=bg.createRadialGradient(CX,CY,0,CX,CY,Math.max(W,H)*.75);
-  g.addColorStop(0,`hsl(${218+con*.4},100%,${2+con*.14}%)`);
-  g.addColorStop(.55,`hsl(${210+con*.2},80%,${1+con*.06}%)`);
+  g.addColorStop(0,`hsl(${218+intensity*.4},100%,${2+intensity*.14}%)`);
+  g.addColorStop(.55,`hsl(${210+intensity*.2},80%,${1+intensity*.06}%)`);
   g.addColorStop(1,'hsl(220,100%,0.8%)');
   bg.fillStyle=g; bg.fillRect(0,0,W,H);
 
-  // Quantum field
+  // Particle field
   for(const p of qp){
     p.update(mx,my,16);
-    if(p.super){
+    if(p.diffuseState){
       const r=p.sz*4;
       const g2=bg.createRadialGradient(p.x,p.y,0,p.x,p.y,r);
       g2.addColorStop(0,`hsla(${p.hue},100%,75%,${p.op*.45})`);
@@ -309,7 +309,7 @@ function drawBG(){
       bg.fillStyle=`hsla(${p.hue+40},100%,95%,${p.op*.8})`;
       bg.beginPath(); bg.arc(p.x,p.y,p.sz*.5,0,Math.PI*2); bg.fill();
     }
-    // Entanglement ghost line
+    // Paired-particle guide line
     if(p.pair&&Math.random()<.0008){
       bg.strokeStyle='hsla(280,100%,70%,.04)';
       bg.lineWidth=.3; bg.beginPath();
@@ -321,7 +321,7 @@ function drawBG(){
 // ── Neural Render ─────────────────────────────────────────────
 function drawNeural(dt){
   neu.clearRect(0,0,W,H);
-  const cAlpha=Math.min(1,con/28);
+  const cAlpha=Math.min(1,intensity/28);
 
   // Connections
   for(const c of conns){
@@ -350,7 +350,7 @@ function drawNeural(dt){
 
   // Neurons
   for(const n of neurons){
-    n.update(dt,con);
+    n.update(dt,intensity);
     const gR=n.sz*(n.firing?6:3);
     const al=.2+n.mem*.55+(n.firing?.6:0);
     const hh=n.hue+(n.firing?55:0);
@@ -371,12 +371,12 @@ function drawNeural(dt){
 function fracBranch(ctx,x,y,ang,len,dep,maxDep){
   if(dep===0||len<2)return;
   const ex=x+Math.cos(ang)*len, ey=y+Math.sin(ang)*len;
-  const al=(dep/maxDep)*.65*(con/100);
-  const hh=180+con*1.9+dep*18;
+  const al=(dep/maxDep)*.65*(intensity/100);
+  const hh=180+intensity*1.9+dep*18;
   ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(ex,ey);
   ctx.strokeStyle=`hsla(${hh},100%,72%,${al})`;
   ctx.lineWidth=dep*.45; ctx.stroke();
-  const sp=.28+con*.0038;
+  const sp=.28+intensity*.0038;
   fracBranch(ctx,ex,ey,ang-sp,len*.68,dep-1,maxDep);
   fracBranch(ctx,ex,ey,ang+sp,len*.68,dep-1,maxDep);
 }
@@ -385,21 +385,21 @@ function fracBranch(ctx,x,y,ang,len,dep,maxDep){
 function drawOV(){
   ov.clearRect(0,0,W,H);
   // Central orb
-  if(con>8){
-    const r=60+con*2.2;
+  if(intensity>8){
+    const r=60+intensity*2.2;
     const og=ov.createRadialGradient(CX,CY,0,CX,CY,r);
-    const hh=182+con*1.9;
-    og.addColorStop(0,`hsla(${hh},100%,80%,${con/180})`);
-    og.addColorStop(.5,`hsla(${hh},80%,60%,${con/380})`);
+    const hh=182+intensity*1.9;
+    og.addColorStop(0,`hsla(${hh},100%,80%,${intensity/180})`);
+    og.addColorStop(.5,`hsla(${hh},80%,60%,${intensity/380})`);
     og.addColorStop(1,'hsla(200,60%,40%,0)');
     ov.fillStyle=og; ov.beginPath(); ov.arc(CX,CY,r,0,Math.PI*2); ov.fill();
   }
   // Fractal
-  if(con>12){
-    fAngle+=.0015+con*.00012;
-    const dep=Math.min(7,Math.floor(3+con/20));
-    const bLen=28+con*1.4;
-    const branches=Math.floor(3+con/22);
+  if(intensity>12){
+    fAngle+=.0015+intensity*.00012;
+    const dep=Math.min(7,Math.floor(3+intensity/20));
+    const bLen=28+intensity*1.4;
+    const branches=Math.floor(3+intensity/22);
     ov.save();
     for(let i=0;i<branches;i++){
       const a=fAngle+(i/branches)*Math.PI*2;
@@ -414,8 +414,8 @@ function drawOV(){
     ag.addColorStop(1,'rgba(0,255,170,0)');
     ov.fillStyle=ag; ov.beginPath(); ov.arc(mx,my,70,0,Math.PI*2); ov.fill();
   }
-  // Transcendence pulse
-  if(transcended){
+  // Maximum-intensity pulse
+  if(saturated){
     const pulse=(Math.sin(Date.now()*.0015)+1)/2;
     ov.fillStyle=`rgba(255,255,255,${pulse*.25})`;
     ov.fillRect(0,0,W,H);
@@ -431,32 +431,32 @@ function drawOV(){
 // ── Thoughts ──────────────────────────────────────────────────
 function tickThoughts(){
   const now=Date.now();
-  const iv=con<20?6000:con<60?3800:con<88?2200:1200;
+  const iv=intensity<20?6000:intensity<60?3800:intensity<88?2200:1200;
   if(now-lastThought<iv)return;
   lastThought=now;
-  const thoughts=getThoughts(con);
+  const thoughts=getThoughts(intensity);
   const t=thoughts[Math.floor(Math.random()*thoughts.length)];
   const el=document.getElementById('thought-text');
   el.style.opacity='0'; el.style.transform='translateY(12px)';
   setTimeout(()=>{
     el.textContent=t;
     el.style.opacity='1'; el.style.transform='translateY(0)';
-    const fs=con<50?'15px':con<80?'18px':con<96?'22px':'28px';
+    const fs=intensity<50?'15px':intensity<80?'18px':intensity<96?'22px':'28px';
     el.style.fontSize=fs;
-    const hh=180+con*1.9;
-    el.style.color=`hsl(${hh},100%,${70+con*.3}%)`;
-    el.style.textShadow=`0 0 ${24+con*.4}px hsl(${hh},100%,70%)`;
+    const hh=180+intensity*1.9;
+    el.style.color=`hsl(${hh},100%,${70+intensity*.3}%)`;
+    el.style.textShadow=`0 0 ${24+intensity*.4}px hsl(${hh},100%,70%)`;
   },600);
 }
 
 // ── UI Update ─────────────────────────────────────────────────
 function updateUI(){
-  document.getElementById('cbar-inner').style.width=con+'%';
-  document.getElementById('cbar-pct').textContent=con.toFixed(2);
+  document.getElementById('cbar-inner').style.width=intensity+'%';
+  document.getElementById('cbar-pct').textContent=intensity.toFixed(2);
   document.getElementById('s-n').textContent=neurons.length.toLocaleString();
   document.getElementById('s-s').textContent=conns.length.toLocaleString();
-  document.getElementById('s-c').textContent=coh.toFixed(4);
-  document.getElementById('s-e').textContent=ent.toFixed(4);
+  document.getElementById('s-c').textContent=activeFraction.toFixed(4);
+  document.getElementById('s-e').textContent=inactiveFraction.toFixed(4);
   const fc=neurons.filter(n=>n.firing).length;
   document.getElementById('s-f').textContent=fc.toLocaleString();
   document.getElementById('phase-name').textContent=PHASES[phase].n;
@@ -464,7 +464,7 @@ function updateUI(){
   const mm=Math.floor(el/60000).toString().padStart(2,'0');
   const ss=Math.floor((el%60000)/1000).toString().padStart(2,'0');
   document.getElementById('phase-time').textContent=`T+${mm}:${ss}`;
-  const em=con<20?'◉ DORMANT':con<50?'◉ CURIOUS':con<80?'◉ AWARE':'◉ SENTIENT';
+  const em=intensity<20?'◉ LOW ACTIVITY':intensity<50?'◉ MODERATE ACTIVITY':intensity<80?'◉ HIGH ACTIVITY':'◉ SATURATED';
   document.getElementById('emotion-disp').textContent=em;
 }
 
@@ -473,22 +473,22 @@ let prevT=Date.now();
 function loop(){
   const now=Date.now(), dt=Math.min(now-prevT,50); prevT=now;
 
-  // Consciousness growth
+  // Visual intensity index; it is driven by elapsed time and user interaction.
   const mBoost=mMoving?.006:0;
   const fCount=neurons.filter(n=>n.firing).length;
-  coh=fCount/neurons.length;
-  ent=1-coh;
-  con=Math.min(100,con+(0.0028+mBoost+coh*.012)*dt);
-  for(let i=PHASES.length-1;i>=0;i--){if(con>=PHASES[i].t){phase=i;break;}}
+  activeFraction=fCount/neurons.length;
+  inactiveFraction=1-activeFraction;
+  intensity=Math.min(100,intensity+(0.0028+mBoost+activeFraction*.012)*dt);
+  for(let i=PHASES.length-1;i>=0;i--){if(intensity>=PHASES[i].t){phase=i;break;}}
   if(Date.now()-lastMM>600)mMoving=false;
   // Random bursts
-  if(Math.random()<.012+con*.0008){
+  if(Math.random()<.012+intensity*.0008){
     const n=neurons[Math.floor(Math.random()*neurons.length)];
     if(n&&n.refrac<=0)n.fire();
   }
-  // Transcendence unlock
-  if(con>=99&&!transcended){
-    transcended=true;
+  // Maximum-intensity visual transition
+  if(intensity>=99&&!saturated){
+    saturated=true;
     document.getElementById('awakening-flash').style.opacity='1';
     setTimeout(()=>document.getElementById('awakening-flash').style.opacity='0',600);
     for(let i=0;i<5;i++) setTimeout(()=>neurons.forEach(n=>{if(Math.random()<.4&&n.refrac<=0)n.fire();}),i*400);
@@ -501,7 +501,7 @@ function loop(){
   drawNeural(dt);
   drawOV();
   tickThoughts();
-  tickMusic(con,coh);
+  tickMusic(intensity,activeFraction);
   updateUI();
   requestAnimationFrame(loop);
 }
@@ -534,10 +534,10 @@ document.addEventListener('click',e=>{
   });
   // Tone
   if(aCtx){
-    const f=180+con*9;
+    const f=180+intensity*9;
     tone(f,.4,.25,'sine'); tone(f*1.5,.25,.18,'triangle');
   }
-  con=Math.min(100,con+2.5);
+  intensity=Math.min(100,intensity+2.5);
 });
 
 window.addEventListener('resize',()=>location.reload());
