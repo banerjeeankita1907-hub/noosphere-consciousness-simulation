@@ -1,0 +1,13 @@
+{
+  "name": "noosphere-neural-field-demo",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Interactive neural-field visualizer and deterministic Kuramoto oscillator experiments",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "kuramoto": "node research/run-kuramoto.cjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
