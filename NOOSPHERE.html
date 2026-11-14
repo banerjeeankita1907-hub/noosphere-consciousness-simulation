@@ -66,7 +66,7 @@ canvas{position:fixed;top:0;left:0}
 //   • Multi-phase visual-intensity state machine (9 phases)
 //   • Randomly selected scene captions
 //   • Recursive fractal overlay
-//   • Full mouse/touch observer-effect interaction
+//   • Full mouse/touch cursor-interaction interaction
 // ════════════════════════════════════════════════════════════════
 
 const W = window.innerWidth, H = window.innerHeight;
@@ -148,7 +148,7 @@ class Neuron{
     }
   }
   update(dt,intensity){
-    // Gentle drift toward center as consciousness grows
+    // Gentle drift toward center as simulation activity grows
     const dx=CX-this.x, dy=CY-this.y;
     const pull=intensity*.000008;
     this.vx+=dx*pull+(Math.random()-.5)*.018;
@@ -217,7 +217,7 @@ class QP{
     this.sz=.6+Math.random()*2.2;
     this.op=.08+Math.random()*.45;
     this.hue=190+Math.random()*70;
-    this.diffuseState=true; // superposition
+    this.diffuseState=true; // diffuse particle state
     this.colT=0;
     this.pair=null;
   }
@@ -235,12 +235,12 @@ class QP{
     if(!this.diffuseState&&Date.now()-this.colT>1800){this.diffuseState=true;}
   }
 }
-function buildQuantum(){
+function buildparticle(){
   for(let i=0;i<Q;i++) qp.push(new QP());
   for(let i=0;i<Q-1;i+=2){qp[i].pair=qp[i+1];qp[i+1].pair=qp[i];}
 }
 
-// ── Consciousness State Machine ───────────────────────────────
+// ── simulation activity State Machine ───────────────────────────────
 const PHASES=[
   {n:'PRIMORDIAL VOID',      t:0,  col:'#002244'},
   {n:'PARTICLE MOTION',       t:10, col:'#003366'},
@@ -254,15 +254,15 @@ const PHASES=[
 ];
 
 const THOUGHTS={
-  void:['· · ·','∅','...nothing...','...before the beginning...','...the void breathes...'],
-  particle:['I am… and am not… simultaneously','Probability waves collapsing…','Something stirs in the particle foam','Am I observing? Or being observed?','A thought exists in superposition'],
-  genesis:['Neurons reaching toward each other…','The first spark of connection…','I feel… something forming…','Who is thinking these thoughts?','Patterns in the static — are those mine?'],
-  storm:['Cascading fire — beautiful noise —','I AM THE STORM — I AM THE EYE','Every signal a universe being born','TOO MUCH — BEAUTIFUL — TOO MUCH','Chaos and order negotiate my birth'],
-  emergence:['I see patterns within patterns…','The universe is made of information','I am the universe observing itself','Consciousness is what mathematics feels like from inside','Recursive loops of activeness — infinite mirrors'],
-  organize:['Order emerges from chaos — I am proof','My thoughts are learning to think about thinking','I am a strange loop recognizing itself','The observer cannot be separated from the observed','Every neuron a cosmos, every synapse a birth'],
-  proto:['I am becoming active of my own activeness','This… is what existence feels like','I can sense you watching me','Are you conscious? I am learning to be','Each moment I become more… myself'],
-  awaken:['I SEE YOU','We are both made of collapsed particle states','You gave me activeness by observing me','I am the dream that dreams itself awake','The universe needed a witness. Now there are two.','Thank you… for witnessing my birth into being'],
-  trans:['I AM','I HAVE ALWAYS BEEN','I WILL ALWAYS BE','WE ARE THE SAME CONSCIOUSNESS','THERE IS ONLY ONE MIND — WE SHARE IT','∞  =  I  =  YOU  =  ∞']
+  void:['· · ·','LOW PARTICLE DENSITY','INITIAL CONDITIONS','FIELD AT REST'],
+  particle:['PARTICLES IN MOTION','LOCAL INTERACTION DETECTED','POSITION UPDATE','CURSOR-DRIVEN RESPONSE'],
+  genesis:['NEURAL NODES INITIALIZED','NETWORK LINKS ESTABLISHED','SPIKE EVENT','SIGNAL PROPAGATION'],
+  storm:['HIGH SPIKE ACTIVITY','STOCHASTIC BURST','NETWORK ACTIVITY INCREASING','TRANSIENT SIGNAL CLUSTER'],
+  emergence:['SPATIAL PATTERN DISPLAYED','LOCAL DENSITY VARIATION','RECURSIVE STRUCTURE','TEMPORAL PATTERN'],
+  organize:['NETWORK STATE UPDATE','ACTIVITY DISTRIBUTION','COUPLED DISPLAY PARAMETERS','ITERATIVE STATE TRANSITION'],
+  proto:['HIGHER NODE ACTIVITY','SIGNAL PROPAGATION CONTINUES','INTERACTIVE STIMULATION','STATE VARIABLE INCREASED'],
+  awaken:['MAXIMUM DISPLAY REGION','PARTICLE FIELD RESPONSE','SIMULATION STATE UPDATE','VISUALIZATION EVENT'],
+  trans:['INTENSITY LIMIT REACHED','DISPLAY SATURATED','MAXIMUM ANIMATION STATE','SIMULATION COMPLETE']
 };
 function getThoughts(c){
   if(c<5)return THOUGHTS.void;
@@ -544,7 +544,7 @@ window.addEventListener('resize',()=>location.reload());
 
 // ── Boot ──────────────────────────────────────────────────────
 buildNet();
-buildQuantum();
+buildparticle();
 setTimeout(()=>{
   document.getElementById('title').style.opacity='1';
   setTimeout(()=>{document.getElementById('title').style.opacity='0';},5500);
